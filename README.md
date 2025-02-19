@@ -1,58 +1,45 @@
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+# Load required libraries
+library(caret)
+library(randomForest)
+library(ggplot2)
 
-# Dataset source: http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har
+# Load dataset
+train_url <- "https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+train_data <- read.csv(train_url, na.strings = c("NA", ""))
+test_data <- read.csv("/mnt/data/pml-testing (2).csv", na.strings = c("NA", ""))
 
-# Load the dataset
-file_path = "/mnt/data/pml-training (1).csv"
-df = pd.read_csv(file_path)
+# Remove columns with too many missing values
+train_data <- train_data[, colSums(is.na(train_data)) == 0]
+test_data <- test_data[, colSums(is.na(test_data)) == 0]
 
-# Drop irrelevant columns
-irrelevant_columns = [
-    "Unnamed: 0", "user_name", "raw_timestamp_part_1", "raw_timestamp_part_2", 
-    "cvtd_timestamp", "new_window", "num_window"
-]
-df_cleaned = df.drop(columns=irrelevant_columns)
+# Remove non-predictive columns (e.g., ID, timestamps, user names)
+nzv <- nearZeroVar(train_data, saveMetrics = TRUE)
+train_data <- train_data[, !nzv$nzv]
+train_data <- train_data[, -c(1:6)] # Removing first few non-predictive columns
 
-# Convert all features to numeric, coercing errors to NaN
-df_cleaned = df_cleaned.apply(pd.to_numeric, errors='coerce')
+test_data <- test_data[, colnames(test_data) %in% colnames(train_data)]
 
-# Reintroduce target variable
-df_cleaned["classe"] = df["classe"]
+# Convert target variable to factor
+train_data$classe <- as.factor(train_data$classe)
 
-# Drop columns with excessive missing values (threshold: 75% non-null values required)
-df_cleaned = df_cleaned.dropna(axis=1, thresh=0.75 * len(df_cleaned))
+# Split data into training and validation sets
+set.seed(123)
+trainIndex <- createDataPartition(train_data$classe, p = 0.7, list = FALSE)
+training_set <- train_data[trainIndex, ]
+validation_set <- train_data[-trainIndex, ]
 
-# Split dataset into features and target variable
-X = df_cleaned.drop(columns=["classe"])
-y = df_cleaned["classe"]
+# Train a Random Forest model
+set.seed(123)
+rf_model <- randomForest(classe ~ ., data = training_set, ntree = 100)
 
-# Split into training (70%) and testing (30%) sets
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
+# Model evaluation
+rf_predictions <- predict(rf_model, validation_set)
+conf_matrix <- confusionMatrix(rf_predictions, validation_set$classe)
+print(conf_matrix)
 
-# Initialize and train the Random Forest model with parallel processing
-rf_model = RandomForestClassifier(n_estimators=100, random_state=42, n_jobs=-1)
+# Make predictions on test set
+final_predictions <- predict(rf_model, test_data)
+print(final_predictions)
 
-# Perform 5-fold cross-validation
-cv_scores = cross_val_score(rf_model, X_train, y_train, cv=5, scoring="accuracy")
-
-# Train the model on the full training set
-rf_model.fit(X_train, y_train)
-
-# Evaluate on the test set
-y_pred = rf_model.predict(X_test)
-test_accuracy = accuracy_score(y_test, y_pred)
-
-# Select 20 random test cases for prediction
-random_samples = X_test.sample(n=20, random_state=42)
-predictions = rf_model.predict(random_samples)
-
-# Print results
-print("Model Performance:")
-print(f" - Cross-validation Accuracy: {np.mean(cv_scores):.4f}")
-print(f" - Test Set Accuracy: {test_accuracy:.4f}")
-print("\nPredictions for 20 test cases:")
-print(predictions)
+# Save predictions
+write.csv(final_predictions, "predictions.csv", row.names = FALSE)
