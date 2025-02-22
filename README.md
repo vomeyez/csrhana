@@ -7,20 +7,9 @@ This project aims to predict the manner in which participants performed exercise
 - **Training Data:** [pml-training.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv)
 - **Test Data:** [pml-testing.csv](https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv)
 
-## Requirements
-This project requires R and the following packages:
-
-```r
-install.packages(c("caret", "randomForest", "rpart", "rpart.plot", "e1071"))
-```
 
 ## Running the Project
 ### Step 1: Load and Preprocess Data
-Run the following script to load and clean the data:
-
-```r
-source("exercise_manner_ml.R")
-```
 
 ### Step 2: Train Model and Evaluate Performance
 The script trains a **Random Forest** model and evaluates it using cross-validation.
