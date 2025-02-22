@@ -33,4 +33,4 @@ Predictions for test cases are printed at the end of the script.
 - `exercise_manner_ml.R`: R script containing model training and evaluation.
 
 ## Author
-Your Name
+Vomeyez
