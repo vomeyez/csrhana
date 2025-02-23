@@ -1,8 +1,8 @@
 ---
-title: "Predicting Exercise Manner Using Machine Learning"
+title: "Practical Machine Learning Course Project"
 subtitle: "Predicting the manner people exercise"
 author: "vomeyez"
-date: "`r Sys.Date()`"
+date: "23-02-2025"
 output: html_document
 ---
 
@@ -16,7 +16,7 @@ This project presents an experiment on prediction of the manner which people exe
 
 ## Introduction
 
-With the advent of wearable technology such as Jawbone Up, Nike FuelBand, and Fitbit, it is now possible to collect large amounts of data on personal activity at relatively low costs. The dataset used in this project comes from six participants who were asked to perform barbell lifts correctly and incorrectly in five different ways. Our goal is to build a model to predict the manner in which the exercise was performed, using accelerometer data from multiple body locations.
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, our goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways.
 
 Training data are available from:
 
@@ -160,5 +160,6 @@ barplot(table(testPrediction), col="orange",
 ```
 ## Conclusion
 
-This report demonstrated the process of data cleaning, model training, cross-validation, and prediction for exercise manner classification. The Random Forest model showed strong performance with low estimated out-of-sample error. The final predictions for the provided test cases are included above.
+A random forest model was trained for prediction of the manner people exercise. The trained model has an accuracy of `r max(rForest$results$Accuracy)` over a 10-fold cross validation.
+
 Prediction using a validation dataset had an accuracy of `r confValid$overall["Accuracy"]`. A final test was performed on a 20-sample dataset.
