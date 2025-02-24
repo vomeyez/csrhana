@@ -1,202 +1,101 @@
 <!DOCTYPE html>
-<!-- saved from url=(0035)https://rpubs.com/hananh190/1275428 -->
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta content="IE=edge" http-equiv="X-UA-Compatible">
-<meta content="width=800" name="viewport">
-<title>RPubs - project</title>
-<meta name="csrf-param" content="authenticity_token">
-<meta name="csrf-token" content="au6hcxG_A-G58v9NEp5MAnbr-uSuOtQ0C_KSmcStZr1KzgmxxU_hnP5Hfu19bBK0f40yDSJUNh63MQY3hQnGYg">
-<link rel="stylesheet" href="./exercise_manner_prediction_files/application-798c5c8185e0577f32ef6e494dc6f4844600dab47b198e609bdfdfc5c2bd1ba6.css" media="all">
-<link rel="stylesheet" href="./exercise_manner_prediction_files/show-bd33ac3577cad80ddfffbc9a91fd52ff5a1492004beda059d971361a49a8afe9.css" media="all">
-<script async="" defer="" src="./exercise_manner_prediction_files/launchpad.bundle.js.download"></script><script async="" src="./exercise_manner_prediction_files/analytics.js.download"></script><script src="./exercise_manner_prediction_files/application-f0c30dc3dc92395deb81849f84afdb351879582dcbbd6f2706a66bff0524a8fc.js.download"></script>
-<link rel="stylesheet" href="./exercise_manner_prediction_files/tzi3tjz.css">
-<script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-20375833-3', 'auto', {'allowLinker': true});
-  ga('require', 'linker');
-  ga('linker:autoLink', ['rstudio.com', 'rstudio.github.io', 'rviews.rstudio.com', 'community.rstudio.com', 'rpubs.rstudio.com', 'environments.rstudio.com', 'rstudio.org', 'dailies.rstudio.com', 'pages.rstudio.com', 'db.rstudio.com', 'solutions.rstudio.com', 'docs.rstudio.com', 'spark.rstudio.com', 'shiny.rstudio.com', 'education.rstudio.com', 'rstudio.cloud', 'shinyapps.io', 'teamadmin.rstudio.com', 'blog.rstudio.com', 'support.rstudio.com'] );
-  ga('send', 'pageview');
-</script>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Practical Machine Learning Course Project</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        h1, h2, h3 { color: #333; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+        code { font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Practical Machine Learning Course Project</h1>
+    <h2>Predicting the manner people exercise</h2>
+    <p><strong>Author:</strong> vomeyez</p>
+    <p><strong>Date:</strong> 23-02-2025</p>
+    
+    <h2>Abstract</h2>
+    <p>This project presents an experiment on prediction of the manner in which people exercise. Data is obtained from commercial gadgets containing accelerometers. A random forest model is used for prediction, achieving an accuracy of 0.99.</p>
+    
+    <h2>Introduction</h2>
+    <p>Using devices such as Jawbone Up, Nike FuelBand, and Fitbit, it is now possible to collect a large amount of data about personal activity relatively inexpensively. These devices are part of the quantified self movement, where enthusiasts track their behaviors for health improvements and pattern recognition. This project uses data from accelerometers placed on participants to predict the manner of barbell lifts.</p>
+    
+    <h3>Data Sources</h3>
+    <ul>
+        <li><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv">Training Data</a></li>
+        <li><a href="https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv">Test Data</a></li>
+    </ul>
+    
+    <h3>Data Description</h3>
+    <p>The outcome variable is <em>classe</em>, a factor variable with five levels:</p>
+    <ul>
+        <li>Class A: Correct execution</li>
+        <li>Class B: Throwing the elbows to the front</li>
+        <li>Class C: Lifting the dumbbell only halfway</li>
+        <li>Class D: Lowering the dumbbell only halfway</li>
+        <li>Class E: Throwing the hips to the front</li>
+    </ul>
+    
+    <h2>Data Exploration</h2>
+    <pre><code># Load libraries
+library(readr)
+library(caret)
+library(randomForest)
 
-<script type="text/javascript" async="" src="./exercise_manner_prediction_files/embed.js.download"></script><script async="" id="dsq_recs_scr" src="./exercise_manner_prediction_files/recommendations.js.download"></script><script src="./exercise_manner_prediction_files/did-0049.min.js.download" async="" charset="UTF-8"></script><script src="./exercise_manner_prediction_files/launchpad-liveramp.js.download" async="" charset="UTF-8"></script></head>
-<body class="show-pub show-toolbars">
-<div class="modal" id="login" style="display: none">
-<div class="modal-header">
-<h1>Sign In</h1>
-</div>
-<div class="modal-body">
-<div class="alert" id="login_message" style="display: none"></div>
-<form action="https://rpubs.com/auth/login" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓" autocomplete="off"><input type="hidden" name="authenticity_token" value="au6hcxG_A-G58v9NEp5MAnbr-uSuOtQ0C_KSmcStZr1KzgmxxU_hnP5Hfu19bBK0f40yDSJUNh63MQY3hQnGYg" autocomplete="off"><input name="return_url" type="hidden" value="">
-<div class="fieldset">
-<div class="control-group">
-<label class="control-label" for="login_username">Username or Email</label>
-<div class="controls">
-<input class="input-xlarge" id="login_username" name="username" type="text">
-</div>
-</div>
-<div class="control-group">
-<label class="control-label" for="login_password">Password</label>
-<div class="controls">
-<input class="input-xlarge" id="login_password" name="password" type="password">
-</div>
-</div>
-<div class="control-group">
-<a href="https://rpubs.com/auth/passwordhelp" target="_blank">Forgot your password?</a>
-</div>
-</div>
-</form>
-</div>
-<div class="modal-footer">
-<button class="btn btn-primary" id="login-modal-submit">Sign In</button>
-<button class="btn" id="login-modal-cancel">Cancel</button>
-</div>
-</div>
-<div class="navbar-inner" id="pageheader">
-<div id="branding">
-<h1 id="logo">
-<a href="https://rpubs.com/"><span id="R">R</span>Pubs
-</a>
-</h1>
-<span id="tagline">by RStudio</span>
-</div>
-<div id="identity">
-<div class="btn-group pull-right">
-<a class="btn btn-inverse btn-small dropdown-toggle" data-toggle="dropdown" href="https://rpubs.com/hananh190/1275428#">
-<img src="./exercise_manner_prediction_files/4d8ed06cc7d904412341734455b7d737.jpg" class="gravatar" alt="gravatar" style="width: 14px; height: 14px">
-&nbsp;hananh190
-<span class="caret"></span>
-</a>
-<ul class="dropdown-menu">
-<li><a href="https://rpubs.com/hananh190">View profile</a></li>
-<li><a href="https://rpubs.com/profile/edit">Edit profile</a></li>
-<li><a href="https://rpubs.com/profile/setpass">Change password</a></li>
-<li class="divider"></li>
-<li><a onclick="rpubs_logout(); return false;" href="https://rpubs.com/hananh190/1275428#">Sign out</a></li>
-</ul>
-</div>
-</div>
-</div>
-<div id="pagebody">
-<div id="payload">
-<iframe allow="fullscreen" src="./exercise_manner_prediction_files/1275428_cffbc827264d47a68a84c4d7e8bc276c.html"></iframe>
-<button class="btn btn-tiny" id="btn-show-toolbars">
-<i class="icon-resize-small"></i>
-</button>
-</div>
-<div class="navbar navbar-fixed-bottom" id="pagefooter">
-<div class="navbar-inner">
-<div class="container-fluid">
-<ul class="nav" id="pubmeta">
-<li>
-<button class="btn btn-small btn-inverse" id="btn-edit">
-Edit Details
-</button>
-</li>
-<li>
-<form onsubmit="return confirm(&quot;This document will be permanently deleted!\n\nAre you sure?&quot;);" action="https://rpubs.com/hananh190/1275428/delete" accept-charset="UTF-8" method="post"><input name="utf8" type="hidden" value="✓" autocomplete="off"><input type="hidden" name="authenticity_token" value="au6hcxG_A-G58v9NEp5MAnbr-uSuOtQ0C_KSmcStZr1KzgmxxU_hnP5Hfu19bBK0f40yDSJUNh63MQY3hQnGYg" autocomplete="off"><button class="btn btn-small btn-inverse" id="btn-delete" style="transition-duration: 0s">
-Delete
-</button>
-</form></li>
-<li id="pubtitle">
-<label>project</label>
-</li>
-<li id="pubauthor">
-<a href="https://rpubs.com/hananh190">by Hana Nur Hanifah</a>
-</li>
-<li id="pubtime">
-<label>
-Last updated
-<time datetime="2025-02-23T07:31:58+00:00">2 minutes ago</time>
-</label>
-</li>
-</ul>
-<ul class="nav pull-right">
-<li>
-<button class="btn btn-small btn-success" id="btn-comments">
-<i class="icon-comment icon-white"></i>
-<span id="comment-verb-hide">
-Hide
-</span>
-Comments
-<span id="comment-count">
-(–)
-</span>
-</button>
-<button class="btn btn-small btn-info" id="btn-share">
-<i class="icon-share icon-white"></i>
-Share
-</button>
-<button class="btn btn-small btn-inverse" id="btn-hide-toolbars">
-Hide Toolbars
-</button>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="modal hide" id="modal-share" style="display: none; margin-left: -225px;">
-<div class="modal-body">
-<btn class="close" data-dismiss="modal" type="button">×</btn>
-<h2 class="first">Post on:</h2>
-<p>
-<a class="btn btn-primary btn-large" href="https://twitter.com/intent/tweet?original_referer=http%3A%2F%2Frpubs.com%2Fhananh190%2F1275428&amp;source=tweetbutton&amp;text=project&amp;url=http%3A%2F%2Frpubs.com%2Fhananh190%2F1275428" onclick="window.open(this.href, &#39;&#39;, &#39;menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=275,width=660&#39;);return false;">
-Twitter
-</a>
-<a class="btn btn-primary btn-large" href="https://www.facebook.com/sharer.php?u=http%3A%2F%2Frpubs.com%2Fhananh190%2F1275428&amp;t=project" onclick="window.open(this.href, &#39;&#39;, &#39;menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=350,width=660&#39;);return false;">
-Facebook
-</a>
-<a class="btn btn-primary btn-large" href="https://plus.google.com/share?url=http%3A%2F%2Frpubs.com%2Fhananh190%2F1275428" onclick="window.open(this.href, &#39;&#39;, &#39;menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600&#39;);return false;">
-Google+
-</a>
-</p>
-<hr>
-<h3>Or copy &amp; paste this link into an email or IM:</h3>
-<input onclick="this.select()" readonly="readonly" value="http://rpubs.com/hananh190/1275428">
-</div>
-</div>
-<script>
-  $('#btn-edit').click(function() {
-    location.href = "/hananh190/1275428/edit";
-  });
-  $('#btn-delete').mouseover(function() {
-    $('#btn-delete').removeClass('btn-inverse').addClass('btn-danger');
-  });
-  $('#btn-delete').mouseout(function() {
-    $('#btn-delete').addClass('btn-inverse').removeClass('btn-danger');
-  });
-  $('#btn-hide-toolbars').click(function() {
-    $(document.body).addClass('hide-toolbars');
-    $(document.body).removeClass('show-toolbars');
-  });
-  $('#btn-show-toolbars').click(function() {
-    $(document.body).addClass('show-toolbars');
-    $(document.body).removeClass('hide-toolbars');
-  });
-  $('#btn-share').click(function() {
-    $('#modal-share').modal().css({
-      'margin-left': function () {
-        return -($(this).width() / 2);
-      }
-    });
-  });
-  $('#btn-comments').click(function() {
-    $(document.body).toggleClass('show-comments');
-  });
-  setInterval(function() {
-    // Poll for comment count. Barf.
-    var text = $('#dsq-num-posts').text();
-    if (text && /^\d+$/.test(text))
-      $('#comment-count').text('(' + text + ')');
-  }, 1000);
-</script>
-<div id="comment-wrapper">
-<div id="disqus_recommendations" style="margin-bottom: 12px;"><iframe id="dsq-app5772" name="dsq-app5772" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" style="width: 310px !important; border: none !important; overflow: hidden !important; height: 260px !important; display: inline !important; box-sizing: border-box !important; padding-right: 10px !important;" src="./exercise_manner_prediction_files/saved_resource.html"></iframe><iframe id="dsq-app5769" name="dsq-app5769" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./exercise_manner_prediction_files/saved_resource(1).html" style="width: calc(100% - 310px) !important; border: none !important; overflow: hidden !important; height: 0px !important; display: inline !important; box-sizing: border-box !important;" horizontalscrolling="no" verticalscrolling="no"></iframe></div><div id="disqus_thread"><iframe id="dsq-app1323" name="dsq-app1323" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" width="100%" src="./exercise_manner_prediction_files/saved_resource(2).html" style="width: 1px !important; min-width: 100% !important; border: none !important; overflow: hidden !important; height: 1464px !important;" horizontalscrolling="no" verticalscrolling="no"></iframe><iframe id="indicator-north" name="indicator-north" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" style="width: 1px !important; border: none !important; overflow: hidden !important; top: 0px !important; min-width: 1px !important; max-width: 1px !important; position: fixed !important; z-index: 2147483646 !important; height: 0px !important; min-height: 0px !important; max-height: 0px !important; display: none !important;" src="./exercise_manner_prediction_files/saved_resource(3).html"></iframe><iframe id="indicator-south" name="indicator-south" allowtransparency="true" frameborder="0" scrolling="no" tabindex="0" title="Disqus" style="width: 1px !important; border: none !important; overflow: hidden !important; bottom: 0px !important; min-width: 1px !important; max-width: 1px !important; position: fixed !important; z-index: 2147483646 !important; height: 0px !important; min-height: 0px !important; max-height: 0px !important; display: none !important;" src="./exercise_manner_prediction_files/saved_resource(4).html"></iframe></div>
-</div>
+# Read datasets
+training <- read_csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv")
+testing <- read_csv("https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv")
 
-</div>
+# Dataset dimensions
+dim(training) # Training dataset size
+dim(testing)  # Testing dataset size
+    </code></pre>
+    
+    <h2>Data Preprocessing</h2>
+    <p>Several variables are removed due to lack of useful information. Variables with more than 85% missing values are also excluded.</p>
+    <pre><code># Remove unnecessary columns
+trainingClean <- training[,-c(1:7)]
+testingClean <- testing[,-c(1:7)]
 
-
-<div id="veepn-guard-alert"><template shadowrootmode="open"><style>html{box-sizing:border-box;text-size-adjust:100%;word-break:normal;-moz-tab-size:4;tab-size:4}*,:before,:after{background-repeat:no-repeat;box-sizing:border-box}:before,:after{text-decoration:inherit;vertical-align:inherit}*{padding:0;margin:0}hr{overflow:visible;height:0;color:inherit;border:0;border-top:1px solid}details,main{display:block}summary{display:list-item}small{font-size:80%}[hidden]{display:none}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}a{background-color:transparent}a:active,a:hover{outline-width:0}code,kbd,pre,samp{font-family:monospace}pre{font-size:1em}b,strong{font-weight:bolder}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{border-color:inherit;text-indent:0}iframe{border-style:none}input{border-radius:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{-webkit-appearance:none;-moz-appearance:none;appearance:none}textarea{overflow:auto;resize:vertical}button,input,optgroup,select,textarea{font:inherit;color:inherit}optgroup{font-weight:700}button{overflow:visible}button,select{text-transform:none}button,[type=button],[type=reset],[type=submit],[role=button]{cursor:pointer}button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{border-style:none;padding:0}button,html [type=button],[type=reset],[type=submit]{-webkit-appearance:button;-moz-appearance:button;appearance:button}button,input,select,textarea{background-color:transparent;border-style:none}button:-moz-focusring,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{outline:1px dotted ButtonText}select{-webkit-appearance:none;-moz-appearance:none;appearance:none}a:focus,button:focus,input:focus,select:focus,textarea:focus{outline-width:0}select::-ms-expand{display:none}select::-ms-value{color:currentcolor}legend{border:0;color:inherit;display:table;white-space:normal;max-width:100%}::-webkit-file-upload-button{-webkit-appearance:button;-moz-appearance:button;appearance:button;color:inherit;font:inherit}[disabled]{cursor:default}img{border-style:none}progress{vertical-align:baseline}[aria-busy=true]{cursor:progress}[aria-controls]{cursor:pointer}[aria-disabled=true]{cursor:default}ul,ol{list-style-type:none}figure{margin:0}.guard-popup{font-family:FigtreeVF,sans-serif;position:fixed;z-index:2147483638;top:8px;left:24px;overflow:visible;color:#222e3a;background-color:#fff;max-width:416px;width:calc(100% - 48px);border-radius:16px;box-shadow:0 4px 20px #00000040;padding:24px}.guard-popup__header{display:flex;justify-content:space-between;align-items:center;column-gap:16px;margin-bottom:24px}.guard-popup__close{display:flex;align-items:center;justify-content:center;width:24px;height:24px;opacity:.7}.guard-popup__img{line-height:0;margin-bottom:24px}.guard-popup__img img{width:100%;aspect-ratio:368/142;object-fit:cover;border-radius:12px;overflow:hidden}.guard-popup__title{font-size:24px;line-height:32px;margin-bottom:8px}.guard-popup__description{font-size:20px;line-height:28px;font-weight:500;color:#4a5764;margin-bottom:28px}.guard-popup__actions{display:flex;justify-content:flex-end;column-gap:16px}.guard-popup__btn{display:flex;align-items:center;justify-content:center;padding:8px 16px;border-radius:5px;font-size:16px;line-height:24px;font-weight:700;cursor:pointer;color:#fff;background:linear-gradient(180deg,#5695fd,#1554ff)}</style></template></div><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style><div id="veepn-breach-alert"><template shadowrootmode="open"><style>.breach-popup{font-family:FigtreeVF,sans-serif;position:fixed;z-index:2147483638;text-rendering:optimizelegibility;top:0;left:0;right:0;pointer-events:none;padding-inline:16px;height:0;overflow:visible;color:#222e3a}.breach-popup *{box-sizing:border-box}.breach-popup__inner{background-color:#de4558;width:100%;border-radius:16px;margin-inline:auto;pointer-events:all;position:relative;transition:transform .25s ease-in-out,max-width .25s ease-in-out;transform:translateY(16px);max-height:calc(100svh - 80px);display:flex;flex-direction:column}.breach-popup__header{min-height:32px;display:flex;align-items:center;justify-content:space-between;column-gap:16px;padding:4px;cursor:pointer}.breach-popup__close{cursor:pointer;background-color:transparent;border-style:none;outline:none;display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;opacity:.5}.breach-popup__wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .25s ease-in-out;overflow:hidden}.breach-popup__content{overflow:hidden;opacity:0;transform:translateY(-10px)}.breach-popup--minimize .breach-popup__inner{max-width:485px;transform:translateY(-100%)}.breach-popup--collapse .breach-popup__inner{max-width:485px}.breach-popup--expand .breach-popup__inner{max-width:1120px}.breach-popup--expand .breach-popup__wrap{grid-template-rows:1fr}.breach-popup--expand .breach-popup__content{opacity:1;transform:translateY(0);transition:transform .25s ease-in-out,opacity .25s ease-in-out;transition-delay:.15s}.breach-popup--expand .breach-popup__header{cursor:default}.breach-info{padding:2px;height:100%}.breach-info__inner{padding:22px 22px 0;background-color:#fff;border-bottom-left-radius:15px;border-bottom-right-radius:15px;height:100%;overflow:auto}.breach-info__alert{font-size:24px;line-height:32px;font-weight:700;margin:0}.breach-info__list{margin-top:24px;display:flex;flex-wrap:wrap;gap:24px}@media only screen and (width >= 992px){.breach-info__list{flex-wrap:nowrap}}.breach-info__item{width:100%}.breach-info__item:nth-child(2){max-width:320px}.breach-info__item:nth-child(3){max-width:200px}.breach-info__title{font-size:18px;font-weight:700;line-height:32px;letter-spacing:-.1px;color:#de4558;margin-top:0;margin-bottom:4px}.breach-info__description{font-size:16px;line-height:28px;letter-spacing:-.1px}.breach-info__description ul{margin:0}.breach-info__actions{display:flex;justify-content:center;padding-top:32px;padding-bottom:22px;background-color:#fff;position:sticky;bottom:0}.breach-info__btn{cursor:pointer;border-style:none;outline:none;display:inline-flex;align-items:center;height:48px;padding-inline:20px;border-radius:12px;text-align:center;font-size:16px;font-weight:700;line-height:28px;letter-spacing:-.1px;color:#fff;background-color:#ff6400}.button-expand{position:absolute;bottom:0;left:50%;transform:translate(-50%,100%);z-index:1}.button-expand__pointer{cursor:pointer}.button-expand__alert{pointer-events:none;transition:opacity .25s ease-in-out}.button-expand__arrow{pointer-events:none;transition:transform .25s ease-in-out,opacity .25s ease-in-out;transform-origin:center}.button-expand--minimize .button-expand__arrow,.button-expand--collapse .button-expand__alert,.button-expand--expand .button-expand__alert{opacity:0}.button-expand--expand .button-expand__arrow{transform:rotate(180deg)}.header-collapse{display:flex;align-items:center;flex-wrap:wrap;column-gap:4px;padding-left:8px;font-size:14px;line-height:20px;letter-spacing:-.1px;color:#fff}.header-expand{display:flex;align-items:center;flex-wrap:wrap;column-gap:4px;padding-left:20px;font-size:14px;font-weight:500;line-height:20px;letter-spacing:-.1px;color:#fff}</style></template></div><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style><iframe style="display: none;" src="./exercise_manner_prediction_files/saved_resource(5).html"></iframe><iframe style="display: none;" src="./exercise_manner_prediction_files/saved_resource(6).html"></iframe><iframe name="__launchpadLocator" style="display: none;" src="./exercise_manner_prediction_files/saved_resource(7).html"></iframe></body></html>
+# Remove columns with too many missing values
+thr <- dim(training)[1] * 0.85
+colArray <- colSums(is.na(trainingClean)) > thr
+trainingClean <- trainingClean[, !colArray]
+testingClean <- testingClean[, !colArray]
+    </code></pre>
+    
+    <h2>Training a Prediction Model</h2>
+    <h3>Partitioning the Dataset</h3>
+    <pre><code># Split data into training and validation sets
+set.seed(24680)
+forTrain <- createDataPartition(trainingClean$classe, p = 0.75, list = FALSE)
+trainSet <- trainingClean[forTrain, ]
+validSet <- trainingClean[-forTrain, ]
+    </code></pre>
+    
+    <h3>Random Forest Model</h3>
+    <pre><code># Train model using 10-fold cross validation
+rForest <- train(classe ~ ., data = trainSet, method = "rf", 
+                 trControl = trainControl(method = "cv", 10), ntree = 200)
+rForest
+    </code></pre>
+    
+    <h3>Validation</h3>
+    <pre><code># Validate model
+valPrediction <- predict(rForest, validSet)
+confValid <- confusionMatrix(valPrediction, factor(validSet$classe))
+confValid
+    </code></pre>
+    
+    <h2>Final Prediction</h2>
+    <pre><code># Predict on test data
+testPrediction <- predict(rForest, testingClean)
+testPrediction
+    </code></pre>
+    
+    <h2>Conclusion</h2>
+    <p>The random forest model was trained with a 10-fold cross-validation, achieving high accuracy. It successfully predicted exercise manner with high precision.</p>
+</body>
+</html>
